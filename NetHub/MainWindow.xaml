@@ -1,0 +1,674 @@
+<Window x:Class="NetHub.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        Title="NetHub — 网枢"
+        Width="960" Height="720"
+        MinWidth="900" MinHeight="680"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None" AllowsTransparency="False" Background="#1E2430"
+        ResizeMode="CanResize" ShowInTaskbar="True"
+        FontFamily="MiSans, MiSans VF, Microsoft YaHei UI, Microsoft YaHei" FontSize="13">
+
+  <WindowChrome.WindowChrome>
+    <!-- 无边框但保留系统拖动与边缘缩放 -->
+    <WindowChrome CaptionHeight="0"
+                  ResizeBorderThickness="8"
+                  GlassFrameThickness="0"
+                  CornerRadius="0"
+                  UseAeroCaptionButtons="False"/>
+  </WindowChrome.WindowChrome>
+
+  <Window.Resources>
+    <SolidColorBrush x:Key="PageBg" Color="#1E2430"/>
+    <SolidColorBrush x:Key="CardBg" Color="#252C3A"/>
+    <SolidColorBrush x:Key="TileBg" Color="#2E3848"/>
+    <SolidColorBrush x:Key="Stroke" Color="#3A445A"/>
+    <SolidColorBrush x:Key="Ink" Color="#F2F5FA"/>
+    <SolidColorBrush x:Key="Muted" Color="#9AA5B8"/>
+    <SolidColorBrush x:Key="Blue" Color="#4DA3FF"/>
+    <SolidColorBrush x:Key="BlueDim" Color="#243A5C"/>
+    <SolidColorBrush x:Key="TipBg" Color="#243049"/>
+    <SolidColorBrush x:Key="Ok" Color="#3DDC97"/>
+    <SolidColorBrush x:Key="OkBg" Color="#1F3A30"/>
+    <SolidColorBrush x:Key="Warn" Color="#F5A623"/>
+    <SolidColorBrush x:Key="WarnBg" Color="#3F3420"/>
+    <SolidColorBrush x:Key="Cyan" Color="#22D3EE"/>
+    <SolidColorBrush x:Key="CyanBg" Color="#1A3A44"/>
+    <SolidColorBrush x:Key="Violet" Color="#A78BFA"/>
+    <SolidColorBrush x:Key="VioletBg" Color="#322A4C"/>
+    <SolidColorBrush x:Key="Rose" Color="#FB7185"/>
+    <SolidColorBrush x:Key="RoseBg" Color="#422832"/>
+
+    <!-- 主滚动条贴合背景 -->
+    <Style TargetType="ScrollBar">
+      <Setter Property="Width" Value="8"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ScrollBar">
+            <Grid Background="Transparent">
+              <Track x:Name="PART_Track" IsDirectionReversed="True">
+                <Track.DecreaseRepeatButton>
+                  <RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" Focusable="False"/>
+                </Track.DecreaseRepeatButton>
+                <Track.IncreaseRepeatButton>
+                  <RepeatButton Command="ScrollBar.PageDownCommand" Opacity="0" Focusable="False"/>
+                </Track.IncreaseRepeatButton>
+                <Track.Thumb>
+                  <Thumb>
+                    <Thumb.Template>
+                      <ControlTemplate TargetType="Thumb">
+                        <Border Background="#2A3344" CornerRadius="4" Margin="1,2"/>
+                      </ControlTemplate>
+                    </Thumb.Template>
+                  </Thumb>
+                </Track.Thumb>
+              </Track>
+            </Grid>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="Card" TargetType="Border">
+      <Setter Property="Background" Value="{StaticResource CardBg}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource Stroke}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="14"/>
+      <Setter Property="Padding" Value="16,14"/>
+    </Style>
+    <Style x:Key="IconTile" TargetType="Border">
+      <Setter Property="Width" Value="28"/>
+      <Setter Property="Height" Value="28"/>
+      <Setter Property="CornerRadius" Value="7"/>
+      <Setter Property="Margin" Value="0,0,10,0"/>
+      <Setter Property="Background" Value="{StaticResource BlueDim}"/>
+    </Style>
+    <Style x:Key="H2" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="14"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+    </Style>
+    <Style x:Key="Small" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="11"/>
+      <Setter Property="Foreground" Value="{StaticResource Muted}"/>
+    </Style>
+    <Style x:Key="Label" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="11"/>
+      <Setter Property="Foreground" Value="{StaticResource Muted}"/>
+      <Setter Property="Margin" Value="0,0,0,4"/>
+    </Style>
+
+    <Style x:Key="Input" TargetType="TextBox">
+      <Setter Property="Background" Value="#2A3344"/>
+      <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource Stroke}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Padding" Value="10,7"/>
+      <Setter Property="CaretBrush" Value="{StaticResource Blue}"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="TextBox">
+            <Border x:Name="bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8">
+              <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource Blue}"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Style x:Key="Pwd" TargetType="PasswordBox">
+      <Setter Property="Background" Value="#2A3344"/>
+      <Setter Property="Foreground" Value="#F2F5FA"/>
+      <Setter Property="BorderBrush" Value="{StaticResource Stroke}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CaretBrush" Value="{StaticResource Blue}"/>
+      <Setter Property="SelectionBrush" Value="{StaticResource Blue}"/>
+      <Setter Property="FontSize" Value="14"/>
+      <!-- 使用系统默认模板，保证密码圆点可渲染；仅改颜色与圆角边 -->
+      <Setter Property="Padding" Value="10,0"/>
+    </Style>
+
+    <Style x:Key="Ico" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+      <Setter Property="FontSize" Value="14"/>
+      <Setter Property="HorizontalAlignment" Value="Center"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <DataTemplate x:Key="AdapterTemplate">
+      <TextBlock Text="{Binding Display}" Foreground="{StaticResource Ink}" FontSize="13"/>
+    </DataTemplate>
+
+    <Style x:Key="Combo" TargetType="ComboBox">
+      <Setter Property="Background" Value="#2A3344"/>
+      <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource Stroke}"/>
+      <Setter Property="MinHeight" Value="36"/>
+      <Setter Property="ItemTemplate" Value="{StaticResource AdapterTemplate}"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ComboBox">
+            <Grid>
+              <ToggleButton x:Name="toggle" Focusable="False" ClickMode="Press"
+                            IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                <ToggleButton.Template>
+                  <ControlTemplate TargetType="ToggleButton">
+                    <Border Background="#2A3344" BorderBrush="{StaticResource Stroke}" BorderThickness="1" CornerRadius="8">
+                      <Path Data="M0,0 L4,4 L8,0" Stroke="{StaticResource Muted}" StrokeThickness="1.5"
+                            HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    </Border>
+                  </ControlTemplate>
+                </ToggleButton.Template>
+              </ToggleButton>
+              <ContentPresenter Margin="10,0,26,0" Content="{TemplateBinding SelectionBoxItem}"
+                                ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                VerticalAlignment="Center" HorizontalAlignment="Left"
+                                TextElement.Foreground="{TemplateBinding Foreground}"
+                                IsHitTestVisible="False"/>
+              <Popup x:Name="PART_Popup" Placement="Bottom" AllowsTransparency="True"
+                     IsOpen="{TemplateBinding IsDropDownOpen}" PopupAnimation="Fade">
+                <Border Background="{StaticResource CardBg}" BorderBrush="{StaticResource Stroke}" BorderThickness="1"
+                        CornerRadius="8" Margin="0,4,0,0" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="240">
+                  <ScrollViewer VerticalScrollBarVisibility="Auto"><ItemsPresenter/></ScrollViewer>
+                </Border>
+              </Popup>
+            </Grid>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+      <Setter Property="ItemContainerStyle">
+        <Setter.Value>
+          <Style TargetType="ComboBoxItem">
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+            <Setter Property="Template">
+              <Setter.Value>
+                <ControlTemplate TargetType="ComboBoxItem">
+                  <Border x:Name="bd" Background="Transparent" Padding="10,8"><ContentPresenter/></Border>
+                  <ControlTemplate.Triggers>
+                    <Trigger Property="IsHighlighted" Value="True">
+                      <Setter TargetName="bd" Property="Background" Value="#2A3344"/>
+                    </Trigger>
+                    <Trigger Property="IsSelected" Value="True">
+                      <Setter TargetName="bd" Property="Background" Value="{StaticResource BlueDim}"/>
+                    </Trigger>
+                  </ControlTemplate.Triggers>
+                </ControlTemplate>
+              </Setter.Value>
+            </Setter>
+          </Style>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="Seg" TargetType="Button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="{StaticResource Muted}"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="14,7"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="bd" Background="Transparent" CornerRadius="7" Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="#2A3344"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Style x:Key="SegOn" TargetType="Button" BasedOn="{StaticResource Seg}">
+      <Setter Property="Background" Value="{StaticResource Blue}"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border Background="{StaticResource Blue}" CornerRadius="7" Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="Btn" TargetType="Button">
+      <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+      <Setter Property="Background" Value="{StaticResource TileBg}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource Stroke}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Padding" Value="12,7"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="#2E3848"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="bd" Property="Opacity" Value="0.45"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Style x:Key="Primary" TargetType="Button" BasedOn="{StaticResource Btn}">
+      <Setter Property="Background" Value="{StaticResource Blue}"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="bd" Background="{StaticResource Blue}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="#5CADFF"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="bd" Property="Opacity" Value="0.45"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Style x:Key="WinBtn" TargetType="Button">
+      <Setter Property="Width" Value="34"/>
+      <Setter Property="Height" Value="26"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="{StaticResource Muted}"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="bd" Background="Transparent" CornerRadius="7" Margin="1">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="#2A3344"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="Tip" TargetType="Border">
+      <Setter Property="Background" Value="{StaticResource TipBg}"/>
+      <Setter Property="BorderBrush" Value="#3A4A66"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="7"/>
+      <Setter Property="Padding" Value="10,7"/>
+    </Style>
+    <Style x:Key="Stat" TargetType="Border">
+      <Setter Property="Background" Value="{StaticResource TileBg}"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Padding" Value="10,8"/>
+    </Style>
+  </Window.Resources>
+
+  <Border Background="{StaticResource PageBg}" CornerRadius="0" BorderThickness="0">
+    <Grid x:Name="RootGrid">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="48"/>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="28"/>
+      </Grid.RowDefinitions>
+
+      <!-- 标题 -->
+      <Grid x:Name="TitleBar" Grid.Row="0" MouseLeftButtonDown="TitleBar_OnMouseLeftButtonDown"
+            shell:WindowChrome.IsHitTestVisibleInChrome="True"
+            Background="Transparent">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Horizontal" Margin="14,0,0,0" VerticalAlignment="Center">
+          <Border Width="28" Height="28" CornerRadius="7" Background="#F2F2F2" Margin="0,0,10,0">
+            <Image Source="Assets/NetHub.png" Width="28" Height="28" Stretch="Uniform"/>
+          </Border>
+          <TextBlock Text="NetHub" FontSize="14" FontWeight="Bold" Foreground="{StaticResource Ink}" VerticalAlignment="Center"/>
+          <TextBlock Text="  网枢" FontSize="11" Foreground="{StaticResource Muted}" VerticalAlignment="Center" Margin="4,2,0,0"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
+          <Ellipse x:Name="AdminDot" Width="7" Height="7" Fill="{StaticResource Ok}"/>
+          <TextBlock x:Name="TxtAdminBadge" Text="管理员" FontSize="11" Foreground="{StaticResource Muted}" Margin="8,0,0,0"/>
+        </StackPanel>
+        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,6,0">
+          <Button x:Name="BtnMin" Style="{StaticResource WinBtn}" Content="─" Click="BtnMin_Click"/>
+          <Button x:Name="BtnClose" Style="{StaticResource WinBtn}" Content="✕" Click="BtnClose_Click"/>
+        </StackPanel>
+      </Grid>
+
+      <!-- 主区：一屏双栏 -->
+      <Grid Grid.Row="1" Margin="12,6">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="10"/>
+          <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="10"/>
+          <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- 左上：网络设置 -->
+        <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource Card}">
+          <StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+              <Border Style="{StaticResource IconTile}">
+                <TextBlock Style="{StaticResource Ico}" Text="&#xE713;" Foreground="{StaticResource Blue}"/>
+              </Border>
+              <TextBlock Text="网络设置" Style="{StaticResource H2}" VerticalAlignment="Center"/>
+              <TextBlock x:Name="TxtMode" Text="静态" FontSize="11" FontWeight="SemiBold"
+                         Foreground="{StaticResource Blue}" Margin="12,0,0,0" VerticalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+              <Button x:Name="BtnSegStatic" Content="⚙  静态 IP" Style="{StaticResource SegOn}" Click="BtnSegStatic_Click"/>
+              <Button x:Name="BtnSegDhcp" Content="⚡  DHCP" Style="{StaticResource Seg}" Click="BtnSegDhcp_Click"/>
+            </StackPanel>
+            <Border Style="{StaticResource Tip}">
+              <TextBlock x:Name="TxtModeHint" Style="{StaticResource Small}" TextWrapping="Wrap"
+                         Text="填写后应用。网关 / DNS 留空保持原样。"/>
+            </Border>
+          </StackPanel>
+        </Border>
+
+        <!-- 右上：路由器 -->
+        <Border Grid.Row="0" Grid.Column="2" Style="{StaticResource Card}">
+          <StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+              <Border Style="{StaticResource IconTile}">
+                <TextBlock Style="{StaticResource Ico}" Text="&#xE704;" Foreground="{StaticResource Warn}"/>
+              </Border>
+              <TextBlock Text="路由器重拨" Style="{StaticResource H2}" VerticalAlignment="Center"/>
+            </StackPanel>
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="6"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <Grid Height="36">
+                <!-- 不用自定义模板，保证密码圆点正常渲染 -->
+                <PasswordBox x:Name="PwdRouter"
+                             Background="#2A3344"
+                             Foreground="#F2F5FA"
+                             BorderBrush="#3A445A"
+                             BorderThickness="1"
+                             FontFamily="Segoe UI"
+                             FontSize="14"
+                             Padding="10,0"
+                             VerticalContentAlignment="Center"/>
+                <TextBox x:Name="PwdRouterPlain"
+                         Background="#2A3344"
+                         Foreground="#F2F5FA"
+                         BorderBrush="#3A445A"
+                         BorderThickness="1"
+                         FontFamily="Consolas"
+                         FontSize="14"
+                         Padding="10,0"
+                         VerticalContentAlignment="Center"
+                         Visibility="Collapsed"/>
+              </Grid>
+              <Button x:Name="TglShowPwd" Grid.Column="2" Content="显示密码" Style="{StaticResource Btn}"
+                      Height="36" Padding="10,0" Click="TglShowPwd_Click"/>
+              <Button x:Name="BtnRedial" Grid.Column="4" Content="重拨换 IP" Style="{StaticResource Primary}"
+                      Height="36" MinWidth="100" Click="BtnRedial_Click"/>
+            </Grid>
+            <CheckBox x:Name="ChkRemember" Content="记住管理密码" Foreground="{StaticResource Muted}"
+                      FontSize="11" Margin="0,8,0,0"/>
+          </StackPanel>
+        </Border>
+
+        <!-- 左下：适配器 + 状态 + IP -->
+        <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource Card}">
+          <StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+              <Border Style="{StaticResource IconTile}">
+                <TextBlock Style="{StaticResource Ico}" Text="&#xE968;" Foreground="{StaticResource Blue}"/>
+              </Border>
+              <TextBlock Text="适配器" Style="{StaticResource H2}" VerticalAlignment="Center"/>
+              <Button x:Name="BtnRefresh" Style="{StaticResource WinBtn}" Content="↻" Margin="8,0,0,0"
+                      Click="BtnRefresh_Click" ToolTip="刷新"/>
+            </StackPanel>
+
+            <Grid Margin="0,0,0,10">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <ComboBox x:Name="CmbAdapter" Style="{StaticResource Combo}" SelectionChanged="CmbAdapter_OnSelectionChanged"/>
+              <Button x:Name="BtnFillCurrent" Grid.Column="2" Content="填入当前" Style="{StaticResource Btn}"
+                      Height="36" VerticalAlignment="Center" Click="BtnFillCurrent_Click"/>
+            </Grid>
+
+            <!-- 状态 2x3 -->
+            <Grid Margin="0,0,0,10">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="6"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="6"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <Border Style="{StaticResource Stat}" Background="{StaticResource WarnBg}">
+                <StackPanel>
+                  <TextBlock Text="状态" Style="{StaticResource Small}"/>
+                  <TextBlock x:Name="TxtAdpStatus" Text="—" FontWeight="SemiBold" Foreground="{StaticResource Warn}" Margin="0,3,0,0"/>
+                </StackPanel>
+              </Border>
+              <Border Grid.Column="2" Style="{StaticResource Stat}" Background="{StaticResource CyanBg}">
+                <StackPanel>
+                  <TextBlock Text="速率" Style="{StaticResource Small}"/>
+                  <TextBlock x:Name="TxtAdpSpeed" Text="—" FontWeight="SemiBold" Foreground="{StaticResource Ink}" Margin="0,3,0,0"/>
+                </StackPanel>
+              </Border>
+              <Border Grid.Column="4" Style="{StaticResource Stat}" Background="{StaticResource VioletBg}">
+                <StackPanel>
+                  <TextBlock Text="分配" Style="{StaticResource Small}"/>
+                  <TextBlock x:Name="TxtAdpAssign" Text="—" FontWeight="SemiBold" Foreground="{StaticResource Ink}" Margin="0,3,0,0"/>
+                </StackPanel>
+              </Border>
+            </Grid>
+            <Grid Margin="0,0,0,12">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="6"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="6"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <Border Style="{StaticResource Stat}" Background="{StaticResource OkBg}">
+                <StackPanel>
+                  <TextBlock Text="IPv4" Style="{StaticResource Small}"/>
+                  <TextBlock x:Name="TxtAdpIp" Text="—" FontWeight="SemiBold" Foreground="{StaticResource Ink}"
+                             FontFamily="Consolas" Margin="0,3,0,0" FontSize="12"/>
+                </StackPanel>
+              </Border>
+              <Border Grid.Column="2" Style="{StaticResource Stat}" Background="{StaticResource BlueDim}">
+                <StackPanel>
+                  <TextBlock Text="网关" Style="{StaticResource Small}"/>
+                  <TextBlock x:Name="TxtAdpGw" Text="—" FontWeight="SemiBold" Foreground="{StaticResource Ink}"
+                             FontFamily="Consolas" Margin="0,3,0,0" FontSize="12"/>
+                </StackPanel>
+              </Border>
+              <Border Grid.Column="4" Style="{StaticResource Stat}" Background="{StaticResource RoseBg}">
+                <StackPanel>
+                  <TextBlock Text="DNS" Style="{StaticResource Small}"/>
+                  <TextBlock x:Name="TxtAdpDns" Text="—" FontWeight="SemiBold" Foreground="{StaticResource Ink}"
+                             FontFamily="Consolas" FontSize="11" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+              </Border>
+            </Grid>
+
+            <TextBlock Text="IP 配置" Style="{StaticResource H2}" Margin="0,0,0,8"/>
+            <Grid Margin="0,0,0,8">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <StackPanel>
+                <TextBlock Text="IP 地址" Style="{StaticResource Label}"/>
+                <TextBox x:Name="TxtIP" Style="{StaticResource Input}" Height="32" FontFamily="Consolas"/>
+              </StackPanel>
+              <StackPanel Grid.Column="2">
+                <TextBlock Text="子网掩码" Style="{StaticResource Label}"/>
+                <TextBox x:Name="TxtMask" Style="{StaticResource Input}" Height="32" FontFamily="Consolas" Text="255.255.255.0"/>
+              </StackPanel>
+            </Grid>
+            <Grid Margin="0,0,0,8">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <StackPanel>
+                <TextBlock Text="网关" Style="{StaticResource Label}"/>
+                <TextBox x:Name="TxtGw" Style="{StaticResource Input}" Height="32" FontFamily="Consolas"/>
+              </StackPanel>
+              <StackPanel Grid.Column="2">
+                <TextBlock Text="首选 DNS" Style="{StaticResource Label}"/>
+                <TextBox x:Name="TxtDns1" Style="{StaticResource Input}" Height="32" FontFamily="Consolas"/>
+              </StackPanel>
+            </Grid>
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <StackPanel>
+                <TextBlock Text="备用 DNS" Style="{StaticResource Label}"/>
+                <TextBox x:Name="TxtDns2" Style="{StaticResource Input}" Height="32" FontFamily="Consolas"/>
+              </StackPanel>
+              <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Bottom">
+                <Button x:Name="BtnStatic" Content="应用配置" Style="{StaticResource Primary}" Height="32" MinWidth="88" Click="BtnStatic_Click"/>
+                <Button x:Name="BtnDhcp" Content="切 DHCP" Style="{StaticResource Btn}" Height="32" MinWidth="78" Margin="6,0,0,0" Click="BtnDhcp_Click"/>
+              </StackPanel>
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <!-- 右下：公网 + 信息 + 日志 -->
+        <StackPanel Grid.Row="2" Grid.Column="2">
+          <Border Style="{StaticResource Card}" Margin="0,0,0,10">
+            <StackPanel>
+              <Grid>
+                <StackPanel Orientation="Horizontal">
+                  <Border Style="{StaticResource IconTile}">
+                    <TextBlock Style="{StaticResource Ico}" Text="&#xE774;" Foreground="{StaticResource Cyan}"/>
+                  </Border>
+                  <TextBlock Text="公网 IP" Style="{StaticResource H2}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <Button x:Name="BtnDetect" Content="↻ 刷新" Style="{StaticResource Btn}" HorizontalAlignment="Right"
+                        Padding="10,5" Click="BtnDetect_Click"/>
+              </Grid>
+              <TextBlock x:Name="TxtPublic" Text="—" FontFamily="Consolas" FontSize="22" FontWeight="Bold"
+                         Foreground="{StaticResource Cyan}" Margin="0,10,0,2"/>
+              <StackPanel Orientation="Horizontal" Margin="0,2,0,4">
+                <TextBlock Text="IPv6  " Style="{StaticResource Small}" VerticalAlignment="Center"/>
+                <TextBlock x:Name="TxtPublicV6" Text="—" FontFamily="Consolas" FontSize="12"
+                           Foreground="{StaticResource Violet}" VerticalAlignment="Center"/>
+              </StackPanel>
+              <Grid>
+                <TextBlock x:Name="TxtPublicSub" Text="启动自动检测 IPv4 / IPv6" Style="{StaticResource Small}"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                  <TextBlock Text="时间 " Style="{StaticResource Small}"/>
+                  <TextBlock x:Name="TxtPubTime" Text="—" Style="{StaticResource Small}"/>
+                </StackPanel>
+              </Grid>
+            </StackPanel>
+          </Border>
+
+          <Border Style="{StaticResource Card}" Margin="0,0,0,10">
+            <StackPanel>
+              <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <Border Style="{StaticResource IconTile}">
+                  <TextBlock Style="{StaticResource Ico}" Text="&#xE946;" Foreground="{StaticResource Violet}"/>
+                </Border>
+                <TextBlock Text="运行信息" Style="{StaticResource H2}" VerticalAlignment="Center"/>
+              </StackPanel>
+              <Grid Margin="0,0,0,6">
+                <TextBlock Text="版本" Style="{StaticResource Small}"/>
+                <TextBlock Text="v1.6" Foreground="{StaticResource Ink}" HorizontalAlignment="Right" FontWeight="SemiBold"/>
+              </Grid>
+              <Grid Margin="0,0,0,6">
+                <TextBlock Text="身份" Style="{StaticResource Small}"/>
+                <TextBlock x:Name="TxtSysAdmin" Text="—" Foreground="{StaticResource Ink}" HorizontalAlignment="Right" FontWeight="SemiBold"/>
+              </Grid>
+              <Grid Margin="0,0,0,6">
+                <TextBlock Text="网卡" Style="{StaticResource Small}"/>
+                <TextBlock x:Name="TxtSysAdapter" Text="—" Foreground="{StaticResource Ink}" HorizontalAlignment="Right"
+                           TextTrimming="CharacterEllipsis" MaxWidth="200"/>
+              </Grid>
+              <Grid>
+                <TextBlock Text="凭据" Style="{StaticResource Small}"/>
+                <TextBlock x:Name="TxtSysCred" Text="—" Foreground="{StaticResource Muted}" HorizontalAlignment="Right"/>
+              </Grid>
+            </StackPanel>
+          </Border>
+
+          <Border Style="{StaticResource Card}">
+            <StackPanel>
+              <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <Border Style="{StaticResource IconTile}">
+                  <TextBlock Style="{StaticResource Ico}" Text="&#xE81C;" Foreground="{StaticResource Muted}"/>
+                </Border>
+                <TextBlock Text="活动日志" Style="{StaticResource H2}" VerticalAlignment="Center"/>
+              </StackPanel>
+              <Border Background="#2A3344" BorderBrush="{StaticResource Stroke}" BorderThickness="1"
+                      CornerRadius="8" Padding="10">
+                <TextBox x:Name="TxtLog" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                         Height="110" Background="Transparent" Foreground="{StaticResource Muted}"
+                         BorderThickness="0" FontFamily="Consolas" FontSize="11"/>
+              </Border>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </Grid>
+
+      <Grid Grid.Row="2">
+        <Border BorderBrush="#2E3848" BorderThickness="0,1,0,0" Background="#1C222E"/>
+        <Grid Margin="14,0">
+          <TextBlock x:Name="TxtStatus" Text="就绪" FontSize="11" Foreground="{StaticResource Muted}" VerticalAlignment="Center"/>
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+            <Ellipse Width="6" Height="6" Fill="{StaticResource Ok}" Margin="0,0,8,0"/>
+            <TextBlock Text="NetHub v1.7" FontSize="11" Foreground="{StaticResource Muted}"/>
+          </StackPanel>
+        </Grid>
+      </Grid>
+    </Grid>
+  </Border>
+</Window>
