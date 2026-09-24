@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/NetworkDoctor.App/NetworkDoctor.App.csproj" />
+    <Project Path="src/NetworkDoctor.Cli/NetworkDoctor.Cli.csproj" />
+    <Project Path="src/NetworkDoctor.Core/NetworkDoctor.Core.csproj" />
+    <Project Path="src/NetworkDoctor.Windows/NetworkDoctor.Windows.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/NetworkDoctor.Tests/NetworkDoctor.Tests.csproj" />
+  </Folder>
+</Solution>
